@@ -1,14 +1,11 @@
-import { Injectable } from '@nestjs/common';
 import {
-  Database,
-  get,
-  getDatabase,
-  onValue,
-  ref,
-  set,
-} from 'firebase/database';
+  BadRequestException,
+  Injectable,
+  UnauthorizedException,
+} from '@nestjs/common';
+import { Database, getDatabase, onValue, ref, set } from 'firebase/database';
 import app from './firebase.config';
-import { reduce } from 'rxjs';
+import { FirebaseAuthError } from 'firebase-admin/lib/utils/error';
 
 @Injectable()
 export class FirebaseService {
@@ -23,13 +20,32 @@ export class FirebaseService {
     await set(reference, data);
   }
 
-  async readDataBase(): Promise<any> {
-    let data;
-    const reference = await ref(this.db, 'comments');
-    const test = await onValue(reference, (snapshot) => {
-      data = snapshot.val();
+  async readDataBase(path: string): Promise<any> {
+    return new Promise((resolve, reject) => {
+      const reference = ref(this.db, path);
+      onValue(
+        reference,
+        (snapshot) => {
+          const data = snapshot.val();
+          if (data) {
+            const dataArray = Object.entries(data).map(([key, value]) => ({
+              id: key,
+              ...(value as object),
+            }));
+            resolve(dataArray);
+          } else {
+            resolve([]);
+          }
+        },
+        (error) => {
+          const data = error as FirebaseAuthError;
+          if (data.code === 'PERMISSION_DENIED') {
+            reject(new UnauthorizedException('Пользователь не авторизован'));
+          } else {
+            reject(new BadRequestException('Ошибка чтения из базы данных'));
+          }
+        },
+      );
     });
-
-    return data;
   }
 }
