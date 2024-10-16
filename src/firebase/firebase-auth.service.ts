@@ -5,6 +5,9 @@ import {
   Auth,
   signOut,
 } from 'firebase/auth';
+import { LoginUserDto } from '../app/auth/dto/user.dto';
+import { UnauthorizedException } from '@nestjs/common';
+import { BadRequestException } from '@nestjs/common';
 
 @Injectable()
 export class FirebaseAuthService {
@@ -14,31 +17,43 @@ export class FirebaseAuthService {
     this.auth = getAuth();
   }
 
-  public signIn() {
-    signInWithEmailAndPassword(this.auth, 'test1@test.ru', '12345678')
+  public signIn(userDTO: LoginUserDto) {
+    return signInWithEmailAndPassword(
+      this.auth,
+      userDTO.email,
+      userDTO.password,
+    )
       .then((userCredential) => {
-        // Signed in
-        const user = userCredential.user;
-
-        console.log('🚀:', userCredential);
-        // ...
+        return {
+          message: `Signing in success: ✅ ${userCredential.user.email}`,
+        };
       })
       .catch((error) => {
-        const errorCode = error.code;
         const errorMessage = error.message;
+        throw new UnauthorizedException(
+          `Failed authenticate user: ${errorMessage}`,
+        );
       });
   }
 
   public signOut() {
-    signOut(this.auth)
+    return signOut(this.auth)
       .then((data) => {
-        // Signed in
-        console.log('🧬:', data);
-        // ...
+        return { message: 'Sign out successful' };
       })
       .catch((error) => {
         const errorCode = error.code;
         const errorMessage = error.message;
+        throw new BadRequestException(
+          `Failed to log out: ${errorMessage} ${errorCode}`,
+        );
       });
+  }
+
+  public checkAuth() {
+    const user = this.auth.currentUser;
+    if (user) {
+      console.log('🍄:', user.email);
+    }
   }
 }
