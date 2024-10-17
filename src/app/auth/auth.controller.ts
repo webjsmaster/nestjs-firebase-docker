@@ -1,15 +1,19 @@
 import { Body, Controller, Get, Post } from '@nestjs/common';
-import { FirebaseAuthService } from '../../firebase/firebase-auth.service';
-import { LoginUserDto } from './dto/user.dto';
+import { UserDto } from './dto/user.dto';
 import { AuthService } from './auth.service';
 
 @Controller('auth')
 export class AuthController {
   constructor(private authService: AuthService) {}
 
-  @Post('/login')
-  login(@Body() userDTO: LoginUserDto) {
-    return this.authService.login(userDTO);
+  @Post('/sign-up')
+  signUp(@Body() userDTO: UserDto) {
+    return this.authService.signUp(userDTO);
+  }
+
+  @Post('/sign-in')
+  sigIn(@Body() userDTO: UserDto) {
+    return this.authService.signIn(userDTO);
   }
 
   @Post('/logout')
@@ -17,8 +21,8 @@ export class AuthController {
     return this.authService.logOut();
   }
 
-  @Get('/user')
+  @Get()
   user() {
-    return this.authService.checkAuth(); // Replace with actual user data
+    return this.authService.checkAuth();
   }
 }

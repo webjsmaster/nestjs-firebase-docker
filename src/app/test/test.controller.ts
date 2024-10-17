@@ -1,13 +1,9 @@
 import { Controller, Get, Post, Body } from '@nestjs/common';
 import { FirebaseService } from '../../firebase/firebase.service';
-import { FirebaseAuthService } from '../../firebase/firebase-auth.service';
 
 @Controller('test')
 export class TestController {
-  constructor(
-    private readonly firebaseService: FirebaseService,
-    private readonly firebaseAuthService: FirebaseAuthService,
-  ) {}
+  constructor(private readonly firebaseService: FirebaseService) {}
 
   @Post('write')
   async writeData(@Body() data: any) {

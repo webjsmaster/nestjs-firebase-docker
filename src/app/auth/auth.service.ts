@@ -1,12 +1,16 @@
 import { Body, Injectable } from '@nestjs/common';
-import { LoginUserDto } from './dto/user.dto';
+import { UserDto } from './dto/user.dto';
 import { FirebaseAuthService } from '../../firebase/firebase-auth.service';
 
 @Injectable()
 export class AuthService {
   constructor(private readonly firebaseAuthService: FirebaseAuthService) {}
 
-  login(@Body() userDTO: LoginUserDto) {
+  signUp(@Body() userDTO: UserDto) {
+    return this.firebaseAuthService.signUp(userDTO);
+  }
+
+  signIn(@Body() userDTO: UserDto) {
     return this.firebaseAuthService.signIn(userDTO);
   }
 
