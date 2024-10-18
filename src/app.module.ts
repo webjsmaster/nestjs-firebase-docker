@@ -3,8 +3,8 @@ import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { ConfigModule } from '@nestjs/config';
 import { FirebaseModule } from './firebase/firebase.module';
-import { TestModule } from './app/test/test.module';
 import { AuthModule } from './app/auth/auth.module';
+import { TasksModule } from './app/tasks/tasks.module';
 
 @Module({
   imports: [
@@ -13,7 +13,7 @@ import { AuthModule } from './app/auth/auth.module';
     }),
     FirebaseModule,
     AuthModule,
-    TestModule,
+    TasksModule,
   ],
   controllers: [AppController],
   providers: [AppService],
